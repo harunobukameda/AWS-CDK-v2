@@ -1,0 +1,122 @@
+1.
+mkdir hello-cdk
+cd hello-cdk
+
+2.
+cdk init app --language javascript
+
+3.
+const cdk = require('aws-cdk-lib');
+const s3 = require('aws-cdk-lib/aws-s3');
+
+class HelloCdkStack extends cdk.Stack {
+  constructor(scope, id, props) {
+    super(scope, id, props);
+
+    new s3.Bucket(this, 'MyFirstBucket', {
+      versioned: true
+    });
+  }
+}
+
+module.exports = { HelloCdkStack }
+
+4.
+const cdk = require('aws-cdk-lib');
+const s3 = require('aws-cdk-lib/aws-s3');
+
+class HelloCdkStack extends cdk.Stack {
+  constructor(scope, id, props) {
+    super(scope, id, props);
+
+new s3.Bucket(this, 'MyFirstBucket', {
+  versioned: true,
+  removalPolicy: cdk.RemovalPolicy.DESTROY,
+  autoDeleteObjects: true
+});
+  }
+}
+
+module.exports = { HelloCdkStack }
+
+5.
+mkdir cdk-workshop && cd cdk-workshop
+
+6.
+cdk init sample-app --language typescript
+
+7.
+import * as cdk from 'aws-cdk-lib';
+
+export class CdkWorkshopStack extends cdk.Stack {
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    // nothing here!
+  }
+}
+
+8.
+exports.handler = async function(event) {
+  console.log("request:", JSON.stringify(event, undefined, 2));
+  return {
+    statusCode: 200,
+    headers: { "Content-Type": "text/plain" },
+    body: `Hello, CDK! You've hit ${event.path}\n`
+  };
+};
+
+9.
+import * as cdk from 'aws-cdk-lib';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+
+export class CdkWorkshopStack extends cdk.Stack {
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    // defines an AWS Lambda resource
+    const hello = new lambda.Function(this, 'HelloHandler', {
+      runtime: lambda.Runtime.NODEJS_14_X,    // execution environment
+      code: lambda.Code.fromAsset('lambda'),  // code loaded from "lambda" directory
+      handler: 'hello.handler'                // file is "hello", function is "handler"
+    });
+  }
+}
+
+
+10.
+exports.handler = async function(event) {
+  console.log("request:", JSON.stringify(event, undefined, 2));
+  return {
+    statusCode: 200,
+    headers: { "Content-Type": "text/plain" },
+    body: `Good Afternoon, CDK! You've hit ${event.path}\n`
+  };
+};
+
+11.
+cdk deploy --hotswap
+
+12.
+import * as cdk from 'aws-cdk-lib';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as apigw from 'aws-cdk-lib/aws-apigateway';
+
+export class CdkWorkshopStack extends cdk.Stack {
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    // defines an AWS Lambda resource
+    const hello = new lambda.Function(this, 'HelloHandler', {
+      runtime: lambda.Runtime.NODEJS_14_X,    // execution environment
+      code: lambda.Code.fromAsset('lambda'),  // code loaded from "lambda" directory
+      handler: 'hello.handler'                // file is "hello", function is "handler"
+    });
+
+    // defines an API Gateway REST API resource backed by our "hello" function.
+    new apigw.LambdaRestApi(this, 'Endpoint', {
+      handler: hello
+    });
+
+  }
+}
